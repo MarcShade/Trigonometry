@@ -17,8 +17,6 @@ def gettan(angle):
     tanrad = math.tan(radians)
     return tanrad
 
-# aaaa
-
 def getsin(angle):
     radians = angle*(math.pi/180)
     sinrad = math.sin(radians)
