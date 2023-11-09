@@ -4,32 +4,19 @@ import numpy
 
 pygame.init()
 
-WIDTH = 1200
-HEIGHT = 800
+WIDTH = 1920
+HEIGHT = 1040
+ORIGO = (WIDTH/2, HEIGHT/2)
+radius = 450
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-angle = 33
+angle = 0
 clock = pygame.time.Clock()
-Δt = clock.tick(144)
 
-def gettan(angle):
-    radians = angle*(math.pi/180)
-    tanrad = math.tan(radians)
-    return tanrad
-
-def getsin(angle):
-    radians = angle*(math.pi/180)
-    sinrad = math.sin(radians)
-    return sinrad
-
-def getcos(angle):
-    radians = angle*(math.pi/180)
-    cosrad = math.cos(radians)
-    return cosrad
-
-def draw_dashed_line(surf, color, start_pos, end_pos, width=1, dash_length=10):
+def draw_dashed_line(surf, color, start_pos, end_pos, width=3, dash_length=8):
     x1, y1 = start_pos
     x2, y2 = end_pos
+    x1, x2, y1, y2 = int(x1), int(x2), int(y1), int(y2)
     dl = dash_length
 
     if (x1 == x2):
@@ -57,21 +44,29 @@ def draw_dashed_line(surf, color, start_pos, end_pos, width=1, dash_length=10):
 
 def draw():
     global angle
-
-    cos = getcos(angle)
-    sin = getsin(angle)
-    tan = gettan(angle)
+    cos = math.cos(math.radians(angle))
+    sin = math.sin(math.radians(angle))
+    tan = math.tan(math.radians(angle))
 
     screen.fill("white")
-    angleline = pygame.draw.line(screen, "black", (WIDTH/2, HEIGHT/2), (WIDTH/2 + 325*cos, HEIGHT/2 + 325*(-sin)), 2)
-    cosline = draw_dashed_line(screen, "darkblue", (int(WIDTH/2 + 325*cos), int(HEIGHT/2)), (int(WIDTH/2 + 325*cos), int(HEIGHT/2 + 325*(-sin))))
-    sinline = draw_dashed_line(screen, "darkred", (int(WIDTH/2), int(HEIGHT/2 + 325*(-sin))), (int(WIDTH/2 + 325*cos), int(HEIGHT/2 + 325*(-sin))))
-    tanline = pygame.draw.line(screen, "darkgreen", (WIDTH / 2 + 325, 0), (WIDTH / 2 + 325, HEIGHT), 2)
-    x_axis = pygame.draw.line(screen, "black", (0, HEIGHT/2), (WIDTH, HEIGHT/2))
-    y_axis = pygame.draw.line(screen, "black", (WIDTH/2, 0), (WIDTH/2, HEIGHT))
-    unitcircle = pygame.draw.circle(screen, "black", (WIDTH/2, HEIGHT/2), 326, 2)
-    angle += 0.01*Δt
+    dashed_cosline = draw_dashed_line(screen, "blue", (int(ORIGO[0] + radius*cos), int(ORIGO[1])), (int(ORIGO[0] + radius*cos), int(ORIGO[1] + radius*(-sin))))
+    dashed_sinline = draw_dashed_line(screen, "red", (int(ORIGO[0]), int(ORIGO[1] + radius*(-sin))), (int(ORIGO[0] + radius*cos), int(ORIGO[1] + radius*(-sin))))
+    dashed_tanline = draw_dashed_line(screen, "chartreuse4", ORIGO, (ORIGO[0] + radius, numpy.clip(ORIGO[1] - radius*tan, -20000, 20000)))
+    
+    angleline = pygame.draw.line(screen, "black", (ORIGO[0], ORIGO[1]), (ORIGO[0] + radius*cos, ORIGO[1] + radius*(-sin)), 3)   
+    
+    x_axis = pygame.draw.line(screen, "black", (0, ORIGO[1]), (WIDTH, ORIGO[1]))
+    y_axis = pygame.draw.line(screen, "black", (ORIGO[0], 0), (ORIGO[0], HEIGHT))
+
+    cosline = pygame.draw.line(screen, "blue", (ORIGO[0], ORIGO[1]), (ORIGO[0] + radius*cos, ORIGO[1]), 3)
+    sinline = pygame.draw.line(screen, "red", (ORIGO[0], ORIGO[1]), (ORIGO[0], ORIGO[1] + radius*(-sin)), 3)
+    tanline = pygame.draw.line(screen, "chartreuse4", (ORIGO[0] + radius, 0), (ORIGO[0] + radius, HEIGHT), 3)
+    
+    unitcircle = pygame.draw.circle(screen, "black", (ORIGO[0], ORIGO[1]), radius, 3)
+    
+    angle += 0.3
     pygame.display.update()
+    clock.tick(144)
 
 def run():
     running = True
